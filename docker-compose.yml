@@ -8,6 +8,9 @@ services:
         container_name: pritunlmdb
         volumes:
             - ./pritunl/mongodb:/data/db
+        networks:
+         VPN:
+          ipv4_address: 10.5.0.2
 
     pritunl:
         build:
@@ -15,9 +18,12 @@ services:
         restart: always
         hostname: pritunl
         container_name: pritunl
-        depends_on:
-            - mongodb
-            - dns
+        # depends_on:
+        #     - mongodb
+        #     - dns
+        networks:
+         VPN:
+          ipv4_address: 10.5.0.3
         privileged: true
         sysctls:
             - net.ipv6.conf.all.disable_ipv6=0
@@ -34,6 +40,7 @@ services:
         environment:
             - TZ=UTC
             - MONGODB_URI=mongodb://mongodb:27017/pritunl
+            # - MONGODB_URI=mongodb://10.5.0.2:27017/pritunl
             # Also enable reverse proxie capabilities
             - REVERSE_PROXY=true
     pihole:
@@ -46,6 +53,9 @@ services:
          - "53:53/udp"
          - "67:67/udp" # Only required if you are using Pi-hole as your DHCP server
          - "80:80/tcp"
+        networks:
+         VPN:
+          ipv4_address: 10.5.0.4
         environment:
           TZ: 'America/Chicago'
       # WEBPASSWORD: 'set a secure password here or it will be random'
@@ -57,3 +67,11 @@ services:
         cap_add:
          - NET_ADMIN # Recommended but not required (DHCP needs NET_ADMIN)      
         restart: unless-stopped
+networks:
+  VPN:
+    name: VPN
+    driver: bridge
+    ipam:
+     config:
+       - subnet: 10.5.0.0/16
+         gateway: 10.5.0.1
