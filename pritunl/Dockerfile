@@ -18,8 +18,8 @@ RUN ORIG_API_SERVER_ESCAPED=$(echo "$ORIG_API_SERVER" | sed -e 's/\./\\./g') && 
     find /usr/lib/python3.9 -type f -print0 | xargs -0 sed -i "s/$ORIG_AUTH_SERVER_ESCAPED/$FAKE_AUTH_SERVER_ESCAPED/g" && \
     find /usr/share/pritunl/www/ -type f -print0 | xargs -0 sed -i "s/$ORIG_AUTH_SERVER_ESCAPED/$FAKE_AUTH_SERVER_ESCAPED/g" && \
     echo 'Done...'
-RUN apt update
-RUN apt install -y git curl wget
+RUN apk update
+RUN apk add git curl wget
 WORKDIR /
 RUN git clone https://github.com/samsesh/pritunl-ui.git
 WORKDIR /pritunl-ui
